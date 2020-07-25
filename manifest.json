@@ -1,0 +1,55 @@
+{
+    "manifest_version": 2,
+    "name": "Sadede Gel Haber Özetleyici ",
+    "version": "0.1.0",
+    "permissions": [
+        "activeTab"
+    ],
+    "background": {
+        "scripts": [
+            "js/background.js"
+        ]
+    },
+    "browser_action": {
+        "default_icon": {
+            "16": "images/logo.png",
+            "32": "images/logo.png",
+            "48": "images/logo.png",
+            "128": "images/logo.png"
+        }
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.hurriyet.com.tr/*",
+                "https://www.milliyet.com.tr/*",
+                "https://www.sozcu.com.tr/*",
+                "https://www.haberturk.com/*",
+                "https://www.sabah.com.tr/*"
+            ],
+            "js": [
+                "js/content.js",
+                "js/jquery-3.5.1.min.js",
+                "js/bootstrap.min.js"
+            ],
+            "css": [
+                "css/bootstrap.min.css",
+                "css/extension.css"
+            ],
+            "all_frames": true,
+            "run_at": "document_end"
+        }
+    ],
+    "icons": {
+        "16": "images/logo.png",
+        "32": "images/logo.png",
+        "48": "images/logo.png",
+        "128": "images/logo.png"
+    },
+    "web_accessible_resources": [
+        "js/bootstrap.min.js",
+        "js/jquery-3.5.1.min.js",
+        "css/bootstrap.min.css",
+        "css/extension.css"
+    ]
+}
