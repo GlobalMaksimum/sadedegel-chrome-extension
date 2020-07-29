@@ -275,19 +275,17 @@ function loadSummaryModal(resp, durations) {
 function changeSummaryLength(event) {
     const duration = event.target.value;
     const unit = document.getElementById(event.target.id).getAttribute("data-unit");
+    $("#summaryTextResponse").fadeOut(10);
     document.getElementById("summaryTextResponse").innerHTML = "";
-    $("#loader").parent().css({ position: "relative" });
-    let topVal = $(".modal-body").offset().top - 28
-    let heightVal = $(".modal-body").height() + 21
-    $("#loader").css({ top: topVal, height: heightVal });
 
     $("#loader").fadeIn(10);
 
     const apiCallPromise = summarize(identifyArticleText(event.target.baseURI), { duration: duration, unit: unit });
     apiCallPromise.then(resp => {
-        document.getElementById("summaryTextResponse").innerHTML = resp.summaryText;
         $(".card-body").html(formStatsBody(resp));
         $("#loader").delay(100).fadeOut();
+        $("#summaryTextResponse").html(resp.summaryText).animate({opacity:1},250);
+        $("#summaryTextResponse").fadeIn(10);
     });
 }
 
