@@ -7,7 +7,6 @@ chrome.runtime.onMessage.addListener(messageReceiver)
 
 // Take action for message sent
 function messageReceiver(message, sender, sendResponse) {
-    console.log(message.url);
 
     // Check summary modal existence
     let isModalExist = document.getElementById("summaryModal");
@@ -20,10 +19,10 @@ function messageReceiver(message, sender, sendResponse) {
         // Create modal from scratch
         const selectedArticleText = identifyArticleText(message.url);
         getArticleDurations(selectedArticleText).then(durations => {
-            console.log(durations.radio2);
             summarize(selectedArticleText, durations.radio2)
-                .then(summaryText => {
-                    loadSummaryModal(summaryText, durations);
+                .then(resp => {
+                    loadSummaryModal(resp, durations);
+                    $("#loader").fadeOut();
                 });
         }
         );
@@ -47,14 +46,11 @@ async function getArticleDurations(article) {
         }
     }).then(res => res.json())
         .then(data => {
-            console.log("total duration" + data.duration);
             let durations = {
                 radio1: calculateDuration(data.duration, 0.1),
                 radio2: calculateDuration(data.duration, 0.5),
                 radio3: calculateDuration(data.duration, 0.8),
             }
-            console.log("api call return object");
-            console.log(durations)
             return durations
         });
     return response;
@@ -78,8 +74,6 @@ async function summarize(article, durationObj) {
     jsonBody["doc"] = article;
     jsonBody["duration"] = durationObj.duration;
     jsonBody["unit"] = durationObj.unit;
-    console.log("jsonbody");
-    console.log(jsonBody);
 
     const response = await fetch(api, {
         method: 'POST',
@@ -96,7 +90,7 @@ async function summarize(article, durationObj) {
         .then(data => {
             let summaryText = '';
             data.sentences.map(sentence => summaryText += sentence);
-            return summaryText;
+            return { summaryText: summaryText, osc: data.original.sentence_count, owc: data.original.word_count, ssc: data.summary.sentence_count, swc: data.summary.word_count };
         });
     return response;
 }
@@ -124,7 +118,7 @@ function identifyArticleText(url) {
 
 
 // Insert modal object to DOM
-function loadSummaryModal(summaryText, durations) {
+function loadSummaryModal(resp, durations) {
 
     // Bootstrap modal
     let summaryModal = document.createElement("div");
@@ -157,10 +151,15 @@ function loadSummaryModal(summaryText, durations) {
     modalBody.className = "modal-body";
     modalContent.appendChild(modalBody);
 
+    let loader = document.createElement("span")
+    loader.className = "loader"
+    loader.id = "loader"
+    modalBody.appendChild(loader)
+
     let modalSummaryText = document.createElement("span");
     modalSummaryText.id = "summaryTextResponse"
     // Set summary content
-    modalSummaryText.innerHTML = summaryText;
+    modalSummaryText.innerHTML = resp.summaryText;
     modalBody.appendChild(modalSummaryText);
 
 
@@ -180,6 +179,11 @@ function loadSummaryModal(summaryText, durations) {
     optionsCollapse.style.marginTop = "20px";
     optionsCollapse.id = "optionsCollapse";
 
+    // Stat Info
+
+    let statInfo = document.createElement("div");
+    statInfo.className = "card";
+    statInfo.innerHTML = formStatsBody(resp);
 
     // Add new summary length options
     let radioIMG = document.createElement('span');
@@ -245,6 +249,7 @@ function loadSummaryModal(summaryText, durations) {
     lengthRangeContainer.appendChild(optWrapper2);
     lengthRangeContainer.appendChild(optWrapper3);
 
+    modalFooter.appendChild(statInfo);
     optionsCollapse.appendChild(lengthRangeContainer);
     modalFooter.appendChild(optionsCollapse);
     modalFooter.appendChild(closeButton);
@@ -264,14 +269,53 @@ function loadSummaryModal(summaryText, durations) {
     // Show modal
     $('#summaryModal').modal({
         keyboard: false
-    })
+    });
 }
 
 function changeSummaryLength(event) {
     const duration = event.target.value;
-    const unit = document.getElementById(event.target.id).getAttribute("data-unit")
+    const unit = document.getElementById(event.target.id).getAttribute("data-unit");
+    document.getElementById("summaryTextResponse").innerHTML = "";
+    $("#loader").parent().css({ position: "relative" });
+    let topVal = $(".modal-body").offset().top - 28
+    let heightVal = $(".modal-body").height() + 21
+    $("#loader").css({ top: topVal, height: heightVal });
+
+    $("#loader").fadeIn(10);
+
     const apiCallPromise = summarize(identifyArticleText(event.target.baseURI), { duration: duration, unit: unit });
-    apiCallPromise.then(summaryText => {
-        document.getElementById("summaryTextResponse").innerHTML = summaryText;
+    apiCallPromise.then(resp => {
+        document.getElementById("summaryTextResponse").innerHTML = resp.summaryText;
+        $(".card-body").html(formStatsBody(resp));
+        $("#loader").delay(100).fadeOut();
     });
+}
+
+
+function formStatsBody(resp) {
+    if (resp.osc && resp.ssc && resp.owc && resp.swc) {
+        return `<div class="card-body row text-center" style="margin-bottom:0px;">
+                <span class="col">
+                    Toplam Cümle Sayısı: ${resp.osc}
+                </span>
+                <span class="col">
+                    Özet Cümle Sayısı: ${resp.ssc}
+                </span>
+                <span class="col">
+                    Toplam Kelime Sayısı: ${resp.owc}
+                </span>
+                <span class="col">
+                    Toplam Kelime Sayısı: ${resp.swc}
+                </span>
+            </div>
+        </div>`;
+    }
+    else {
+        return `<div class="card-body row text-center" style="margin-bottom:0px;">
+                <span class="col">
+                    Hata! İstatistik alınamadı.
+                </span>
+            </div>
+        </div>`;
+    }
 }
