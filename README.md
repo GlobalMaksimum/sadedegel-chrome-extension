@@ -2,7 +2,7 @@
 
 # SadedeGel Chrome Extension
 
-SadedeGel Chrome Extension is a handy usage of SadedeGel library. 
+SadedeGel Chrome Extension is a handy usage of SadedeGel library. Developed as a part of [Açık Kaynak Hackathon Programı 2020](https://www.acikhack.com/).
 
 Supported news websites:
 * [hurriyet.com.tr](https://www.hurriyet.com.tr/)
@@ -12,6 +12,24 @@ Supported news websites:
 * [sabah.com.tr](https://www.sabah.com.tr/)
 
 Please check [SadedeGel](https://github.com/GlobalMaksimum/sadedegel) repository for more information.
+
+[![License](https://img.shields.io/pypi/l/sadedegel)](https://github.com/GlobalMaksimum/sadedegel-chrome-extension/blob/master/LICENSE)
+![Last Commit](https://img.shields.io/github/last-commit/globalmaksimum/sadedegel-chrome-extension?style=plastic&logo=GitHub)
+
+## 💬 Where to ask questions
+
+The SadedeGel project is maintained by [@globalmaksmum](https://github.com/GlobalMaksimum) AI team members
+[@dafajon](https://github.com/dafajon),
+[@askarbozcan](https://github.com/askarbozcan),
+[@mccakir](https://github.com/mccakir) and 
+[@husnusensoy](https://github.com/husnusensoy). 
+
+| Type                     | Platforms                                              |
+| ------------------------ | ------------------------------------------------------ |
+| 🚨 **Bug Reports**       | [GitHub Issue Tracker]                                 |
+| 🎁 **Feature Requests**  | [GitHub Issue Tracker]                                 |
+
+[github issue tracker]: https://github.com/GlobalMaksimum/sadedegel-chrome-extension/issues
 
 ## Installation
 
