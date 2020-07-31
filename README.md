@@ -4,12 +4,12 @@
 
 SadedeGel Chrome Extension is a handy usage of SadedeGel library. Developed as a part of [Açık Kaynak Hackathon Programı 2020](https://www.acikhack.com/).
 
-Supported news websites:
-* [hurriyet.com.tr](https://www.hurriyet.com.tr/)
-* [milliyet.com.tr](https://www.milliyet.com.tr/)
-* [sozcu.com.tr](https://www.sozcu.com.tr/)
-* [haberturk.com](https://haberturk.com/)
-* [sabah.com.tr](https://www.sabah.com.tr/)
+It summarizes articles on authors page of supported news websites:
+* [hurriyet.com.tr](https://www.hurriyet.com.tr/yazarlar/)
+* [milliyet.com.tr](https://www.milliyet.com.tr/yazarlar/)
+* [sozcu.com.tr](https://www.sozcu.com.tr/kategori/yazarlar/)
+* [haberturk.com](https://www.haberturk.com/htyazarlar)
+* [sabah.com.tr](https://www.sabah.com.tr/yazarlar)
 
 Please check [SadedeGel](https://github.com/GlobalMaksimum/sadedegel) repository for more information.
 
@@ -40,13 +40,21 @@ The SadedeGel project is maintained by [@globalmaksmum](https://github.com/Globa
 
 <img src="images/load_extension.png" width="400"> 
 
+<b>It is ready to use.</b>
+
+If you want to use Sadedegel.server local instance please follow additional steps:
+
 5. Install <b>[SadedeGel](https://github.com/GlobalMaksimum/sadedegel)</b> 
 ```bash 
-pip install sadedegel
+$ pip install sadedegel
 ``` 
 6. Run Sadedegel summarizer server
 ```bash
-python3 -m sadedegel.server 
+$ python3 -m sadedegel.server 
+```
+7. Change api address to localhost in <b>content.js</b>
+```javascript
+const api = "http://localhost:8000"
 ```
 
 

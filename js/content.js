@@ -1,6 +1,7 @@
 // Constants
-const api = "https://sadedegel.herokuapp.com/api/summarizer/rouge1";
-const apiStats = "https://sadedegel.herokuapp.com/api/doc/statistics";
+const api = "https://sadedegel.herokuapp.com"
+const summarizerEndpoint = "/api/summarizer/rouge1";
+const statsEndpoint = "/api/doc/statistics";
 
 // Listen message from background script
 chrome.runtime.onMessage.addListener(messageReceiver)
@@ -33,7 +34,7 @@ async function getArticleDurations(article) {
     let jsonBody = {};
     jsonBody["doc"] = article;
 
-    const response = await fetch(apiStats, {
+    const response = await fetch(api + statsEndpoint, {
         method: 'POST',
         body: JSON.stringify(jsonBody),
         headers: {
@@ -75,7 +76,7 @@ async function summarize(article, durationObj) {
     jsonBody["duration"] = durationObj.duration;
     jsonBody["unit"] = durationObj.unit;
 
-    const response = await fetch(api, {
+    const response = await fetch(api + summarizerEndpoint, {
         method: 'POST',
         body: JSON.stringify(jsonBody),
         headers: {
@@ -284,7 +285,7 @@ function changeSummaryLength(event) {
     apiCallPromise.then(resp => {
         $(".card-body").html(formStatsBody(resp));
         $("#loader").delay(100).fadeOut();
-        $("#summaryTextResponse").html(resp.summaryText).animate({opacity:1},250);
+        $("#summaryTextResponse").html(resp.summaryText).animate({ opacity: 1 }, 250);
         $("#summaryTextResponse").fadeIn(10);
     });
 }
@@ -303,7 +304,7 @@ function formStatsBody(resp) {
                     Toplam Kelime Sayısı: ${resp.owc}
                 </span>
                 <span class="col">
-                    Toplam Kelime Sayısı: ${resp.swc}
+                    Özet Kelime Sayısı: ${resp.swc}
                 </span>
             </div>
         </div>`;
