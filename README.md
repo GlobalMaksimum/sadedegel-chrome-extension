@@ -53,9 +53,6 @@ python3 -m sadedegel.server
 ## Usage
 Click the extension icon on news website's article page.
 
-<img src="images/usage.png" width="400">
-
-## Output
 Extension pops up a modal and allows you to modify certain options.
 
-<img src="images/modal.png" width="400">
+![](images/how-it-works.gif)
