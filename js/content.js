@@ -19,14 +19,17 @@ function messageReceiver(message, sender, sendResponse) {
     } else {
         // Create modal from scratch
         const selectedArticleText = identifyArticleText(message.url);
-        getArticleDurations(selectedArticleText).then(durations => {
-            summarize(selectedArticleText, durations.radio2)
-                .then(resp => {
-                    loadSummaryModal(resp, durations);
-                    $("#loader").fadeOut();
-                });
+        if (selectedArticleText) {
+            createSummaryModal();
+            getArticleDurations(selectedArticleText).then(durations => {
+                summarize(selectedArticleText, durations.radio2)
+                    .then(resp => {
+                        loadSummaryData(resp, durations);
+                        $("#loader").fadeOut();
+                    });
+            }
+            );
         }
-        );
     }
 }
 
@@ -90,38 +93,38 @@ async function summarize(article, durationObj) {
     }).then(res => res.json())
         .then(data => {
             let summaryText = '';
-            data.sentences.map(sentence => summaryText += sentence);
+            data.sentences.map(sentence => summaryText += ' ' + sentence);
             return { summaryText: summaryText, osc: data.original.sentence_count, owc: data.original.word_count, ssc: data.summary.sentence_count, swc: data.summary.word_count };
         });
     return response;
 }
 
 function identifyArticleText(url) {
-    if (url.includes("hurriyet.com.tr")) {
-        return document.getElementsByClassName('article-content news-text')[0].outerText;
-    }
-    else if (url.includes("milliyet.com.tr")) {
-        return document.getElementsByClassName('article__content')[0].outerText;
-    }
-    else if (url.includes("sozcu.com.tr")) {
-        return document.getElementsByClassName('author-the-content content-element')[0].outerText;
-    }
-    else if (url.includes("haberturk.com")) {
-        return document.getElementsByClassName('content type1 newsArticle')[0].outerText;
-    }
-    else if (url.includes("sabah.com.tr")) {
-        return document.getElementsByClassName('newsBox')[0].outerText;
-    }
-    else {
-        console.log("Bu websitesi henüz desteklenmiyor!");
+    try {
+        if (url.includes("hurriyet.com.tr")) {
+            return document.getElementsByClassName('article-content news-text')[0].outerText;
+        }
+        else if (url.includes("milliyet.com.tr")) {
+            return document.getElementsByClassName('article__content')[0].outerText;
+        }
+        else if (url.includes("sozcu.com.tr")) {
+            return document.getElementsByClassName('author-the-content content-element')[0].outerText;
+        }
+        else if (url.includes("haberturk.com")) {
+            return document.getElementsByClassName('content type1 newsArticle')[0].outerText;
+        }
+        else if (url.includes("sabah.com.tr")) {
+            return document.getElementsByClassName('newsBox')[0].outerText;
+        }
+        else {
+            throw "Bu websitesi henüz desteklenmiyor!"
+        }
+    } catch (exception) {
+        console.error("Eklentiyi desteklenmeyen sayfada çalıştırdınız!");
     }
 }
 
-
-// Insert modal object to DOM
-function loadSummaryModal(resp, durations) {
-
-    // Bootstrap modal
+function createSummaryModal() {
     let summaryModal = document.createElement("div");
     summaryModal.id = "summaryModal";
     summaryModal.className = "modal fade";
@@ -160,7 +163,7 @@ function loadSummaryModal(resp, durations) {
     let modalSummaryText = document.createElement("span");
     modalSummaryText.id = "summaryTextResponse"
     // Set summary content
-    modalSummaryText.innerHTML = resp.summaryText;
+    modalSummaryText.innerHTML = "";
     modalBody.appendChild(modalSummaryText);
 
 
@@ -183,8 +186,29 @@ function loadSummaryModal(resp, durations) {
     // Stat Info
 
     let statInfo = document.createElement("div");
+    statInfo.id = "statInfo";
     statInfo.className = "card";
-    statInfo.innerHTML = formStatsBody(resp);
+    statInfo.innerHTML = "";
+
+
+    modalFooter.appendChild(statInfo);
+    modalFooter.appendChild(optionsCollapse);
+    modalFooter.appendChild(closeButton);
+
+    // Append modal to body
+    document.body.appendChild(summaryModal);
+
+    // Show modal
+    $('#summaryModal').modal({
+        keyboard: false
+    });
+}
+
+// Insert modal object to DOM
+function loadSummaryData(resp, durations) {
+    // Bootstrap modal
+    document.getElementById("summaryTextResponse").innerHTML = resp.summaryText;
+    document.getElementById("statInfo").innerHTML = formStatsBody(resp);
 
     // Add new summary length options
     let radioIMG = document.createElement('span');
@@ -250,28 +274,23 @@ function loadSummaryModal(resp, durations) {
     lengthRangeContainer.appendChild(optWrapper2);
     lengthRangeContainer.appendChild(optWrapper3);
 
-    modalFooter.appendChild(statInfo);
-    optionsCollapse.appendChild(lengthRangeContainer);
-    modalFooter.appendChild(optionsCollapse);
-    modalFooter.appendChild(closeButton);
 
-    // Append modal to body
-    document.body.appendChild(summaryModal);
+    document.getElementById("optionsCollapse").appendChild(lengthRangeContainer);
+
 
     // Add event listeners for radio buttons
     const radios = document.querySelectorAll('input[type=radio][name=length]');
     radios.forEach(radio => radio.addEventListener('change', changeSummaryLength));
+
 
     $('#optionsWrapper .form-check-label').click((e) => {
         $('#optionsWrapper').find('.active').removeClass('active');
         e.target.parentNode.classList.add('active');
     });
 
-    // Show modal
-    $('#summaryModal').modal({
-        keyboard: false
-    });
+
 }
+
 
 function changeSummaryLength(event) {
     const duration = event.target.value;
